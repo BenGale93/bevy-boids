@@ -19,6 +19,7 @@ fn main() {
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1000.0),
             interaction::InteractionPlugin,
         ))
+        .add_systems(Startup, config::physics_setup)
         .insert_resource(Msaa::Sample4);
 
     #[cfg(debug_assertions)]
