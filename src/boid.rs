@@ -4,10 +4,10 @@ use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-fn boid_points(center: (f32, f32)) -> [Vec2; 3] {
-    let tip = Vec2::new(center.0, center.1 + 1.0);
-    let left = Vec2::new(center.0 - 0.4, center.1);
-    let right = Vec2::new(center.0 + 0.4, center.1);
+fn boid_points() -> [Vec2; 3] {
+    let tip = Vec2::new(0.0, 1.0);
+    let left = Vec2::new(-0.4, 0.0);
+    let right = Vec2::new(0.4, 0.0);
 
     [tip, left, right].map(|x| x * 100.)
 }
@@ -21,8 +21,8 @@ pub struct BoidBundle {
 }
 
 impl BoidBundle {
-    fn spawn_boid(center: (f32, f32), angle: f32) -> Self {
-        let points = boid_points(center);
+    fn spawn_boid(center: (f32, f32), angle: f32, color: Color) -> Self {
+        let points = boid_points();
 
         let shape = shapes::Polygon {
             points: points.into_iter().collect(),
@@ -43,7 +43,7 @@ impl BoidBundle {
                 },
                 ..Default::default()
             },
-            color: Fill::color(Color::CYAN),
+            color: Fill::color(color),
             stroke: Stroke::new(Color::BLACK, 1.0),
             collider,
         }
@@ -51,10 +51,13 @@ impl BoidBundle {
 }
 
 fn setup_system(mut commands: Commands) {
-    let locations = [((0.0, 0.0), PI / 2.0), ((-1.0, 0.0), PI)];
-    for location in &locations {
+    let spawn_data = [
+        ((0.0, 0.0), 0.0, Color::CYAN),
+        ((100.0, 0.0), PI, Color::CRIMSON),
+    ];
+    for data in &spawn_data {
         commands
-            .spawn(BoidBundle::spawn_boid(location.0, location.1))
+            .spawn(BoidBundle::spawn_boid(data.0, data.1, data.2))
             .insert(RigidBody::Dynamic)
             .insert(Damping {
                 linear_damping: 1.0,
